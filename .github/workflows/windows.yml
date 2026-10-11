@@ -20,9 +20,7 @@ jobs:
         uses: tailscale/github-action@v2
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
-
-      - name: Activer le routage Tailscale
-        run: sudo tailscale up --accept-routes
+          args: --accept-routes
 
       - name: Lancer Windows 10 via Docker
         run: |
