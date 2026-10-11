@@ -19,11 +19,7 @@ jobs:
       - name: Connecter le runner GitHub à Tailscale
         uses: tailscale/github-action@v2
         with:
-          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          # Alternative avec une clé d'authentification classique (Auth Key) :
-          # authkey: ${{ secrets.TS_AUTHKEY }}
-          args: --advertise-exit-node
+          authkey: ${{ secrets.TS_AUTHKEY }}
 
       - name: Lancer Windows 10 via Docker (en mode host network)
         run: |
