@@ -21,22 +21,25 @@ jobs:
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
 
-      - name: Lancer Windows 10 via Docker (en mode host network)
+      - name: Activer le routage Tailscale
+        run: sudo tailscale up --accept-routes
+
+      - name: Lancer Windows 10 via Docker
         run: |
           docker run -d --name windows10 \
             --device=/dev/kvm \
             --cap-add=NET_ADMIN \
             -e VERSION="10" \
-            --net=host \
+            -p 3389:3389/tcp \
+            -p 3389:3389/udp \
             dockurr/windows
 
       - name: Récupérer l'IP Tailscale du runner
         run: |
           echo "=== ADRESSE IP TAILSCALE DU RUNNER ==="
           tailscale ip -4
-          echo "Utilisez cette adresse IP suivie du port 3389 dans votre client RDP (ex: 100.x.x.x:3389)"
+          echo "Utilisez cette IP dans le Bureau à distance : [IP_TAILSCALE]:3389"
 
       - name: Garder la session active
         run: |
-          # Le runner reste allumé pendant 2 heures pour vous laisser travailler
           sleep 7200
