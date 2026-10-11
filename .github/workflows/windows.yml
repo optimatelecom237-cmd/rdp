@@ -40,4 +40,4 @@ jobs:
 
       - name: Garder la session active
         run: |
-          sleep 7200
+          sleep 21600
