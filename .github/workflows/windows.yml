@@ -24,12 +24,17 @@ jobs:
             -p 8006:8006 \
             dockurr/windows
 
-      - name: Configurer un tunnel SSH pour accéder à l'interface Web (Port 8006)
+      - name: Installer Cloudflare Tunnel (cloudflared)
         run: |
-          # Affiche la commande SSH à lancer depuis votre PC local pour voir Windows directement dans votre navigateur
-          echo "=== COMMANDE À LANCER SUR VOTRE PC LOCAL ==="
-          echo "ssh -o StrictHostKeyChecking=no -R 8006:localhost:8006 localhost.run"
-          echo "============================================="
+          curl -L --output cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Lancer le tunnel Cloudflare pour le port 8006
+        run: |
+          echo "=== URL D'ACCÈS CLOUDFLARE ==="
+          cloudflared tunnel --url http://localhost:8006 &
+          sleep 10
 
       - name: Garder la session active
         run: |
