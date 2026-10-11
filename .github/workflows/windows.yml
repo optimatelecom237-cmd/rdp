@@ -26,11 +26,11 @@ jobs:
             -p 3389:3389/udp \
             dockurr/windows
 
-      - name: Installer Playit.gg
+      - name: Télécharger et installer Playit.gg directement
         run: |
-          curl -SsL https://playit-cloud.github.io/ppa/key.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/playit-keyring.gpg
-          echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit-keyring.gpg] https://playit-cloud.github.io/ppa/debian stable main" | sudo tee /etc/apt/sources.list.d/playit-cloud.list
-          sudo apt update && sudo apt install -y playit
+          curl -SsL https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64 -o playit
+          chmod +x playit
+          sudo mv playit /usr/local/bin/playit
 
       - name: Lancer le tunnel Playit.gg pour le RDP (3389)
         run: |
