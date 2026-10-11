@@ -26,19 +26,12 @@ jobs:
             -p 3389:3389/udp \
             dockurr/windows
 
-      - name: Installer Node.js et LocalTunnel
-        run: |
-          sudo apt-get update && sudo apt-get install -y nodejs npm
-          sudo npm install -g localtunnel
+      - name: Patienter le démarrage complet de Windows
+        run: sleep 30
 
-      - name: Ouvrir le tunnel RDP via LocalTunnel
+      - name: Ouvrir un tunnel TCP sécurisé via Pinggy
         run: |
-          nohup lt --port 3389 &
-          sleep 5
-          echo "=== LIEN RDP LOCALTUNNEL ==="
-          curl -s https://loca.lt/mytunnelpassword || true
-
-      - name: Garder la session active
-        run: |
-          # Le runner reste allumé pendant 2 heures
-          sleep 7200
+          echo "=== COPIEZ L'ADRESSE TCP CI-DESSOUS POUR LE RDP ==="
+          # Lance un tunnel TCP gratuit vers le port 3389
+          ssh -o StrictHostKeyChecking=no -R 0:localhost:3389 tcp@a.pinggy.io &
+          sleep 10
