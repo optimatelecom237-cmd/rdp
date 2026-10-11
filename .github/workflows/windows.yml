@@ -28,9 +28,9 @@ jobs:
 
       - name: Installer Ngrok
         run: |
-          curl -s https://certified.raw.githubusercontent.com/ngrok/ngrok/v3/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
-          echo "deb https://ngrok-agent.azureedge.net buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
-          sudo apt update && sudo apt install -y ngrok
+          curl -sSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o ngrok.tgz
+          sudo tar -xzf ngrok.tgz -C /usr/local/bin
+          rm ngrok.tgz
           ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
 
       - name: Ouvrir le tunnel RDP via Ngrok
