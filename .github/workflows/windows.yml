@@ -1,0 +1,39 @@
+name: Windows Docker RDP
+
+on:
+  workflow_dispatch: # Permet de lancer le workflow manuellement depuis l'onglet Actions de GitHub
+
+jobs:
+  run-windows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Vérifier la disponibilité de KVM (Virtualisation)
+        run: |
+          echo "Vérification de /dev/kvm :"
+          ls -l /dev/kvm || echo "KVM non disponible directement"
+
+      - name: Lancer les services avec Docker Compose
+        run: |
+          docker compose up -d
+
+      - name: Installer Ngrok pour exposer le RDP
+        run: |
+          curl -sLok https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar xz
+          sudo mv ngrok /usr/local/bin/
+          # Remplacez par votre token ngrok si vous en avez un, ou utilisez un tunnel anonyme
+          ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
+
+      - name: Exposer le port RDP (3389) via Ngrok
+        run: |
+          nohup ngrok tcp 3389 --region eu &
+          sleep 5
+          echo "=== URL RDP Ngrok ==="
+          curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"'
+
+      - name: Garder le runner actif pour les tests
+        run: |
+          # Garde la machine active pendant 2 heures (maximum autorisé par job)
+          sleep 7200
