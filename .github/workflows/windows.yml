@@ -1,4 +1,4 @@
-name: Windows RDP Workflow
+name: Windows Web Workflow
 
 on:
   workflow_dispatch:
@@ -22,21 +22,14 @@ jobs:
             --device=/dev/kvm \
             --cap-add=NET_ADMIN \
             -p 8006:8006 \
-            -p 3389:3389/tcp \
-            -p 3389:3389/udp \
             dockurr/windows
 
-      - name: Télécharger et installer Playit.gg directement
+      - name: Configurer un tunnel SSH pour accéder à l'interface Web (Port 8006)
         run: |
-          curl -SsL https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64 -o playit
-          chmod +x playit
-          sudo mv playit /usr/local/bin/playit
-
-      - name: Lancer le tunnel Playit.gg pour le RDP (3389)
-        run: |
-          echo "=== LIEN PLAYIT.GG (Regardez les logs pour l'adresse TCP) ==="
-          playit &
-          sleep 15
+          # Affiche la commande SSH à lancer depuis votre PC local pour voir Windows directement dans votre navigateur
+          echo "=== COMMANDE À LANCER SUR VOTRE PC LOCAL ==="
+          echo "ssh -o StrictHostKeyChecking=no -R 8006:localhost:8006 localhost.run"
+          echo "============================================="
 
       - name: Garder la session active
         run: |
