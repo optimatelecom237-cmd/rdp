@@ -1,4 +1,4 @@
-name: Windows Web Workflow
+name: Windows RDP via Tailscale
 
 on:
   workflow_dispatch:
@@ -16,28 +16,31 @@ jobs:
           sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
           ls -l /dev/kvm
 
-      - name: Lancer Windows 10 via Docker
+      - name: Connecter le runner GitHub à Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          # Alternative avec une clé d'authentification classique (Auth Key) :
+          # authkey: ${{ secrets.TS_AUTHKEY }}
+          args: --advertise-exit-node
+
+      - name: Lancer Windows 10 via Docker (en mode host network)
         run: |
           docker run -d --name windows10 \
             --device=/dev/kvm \
             --cap-add=NET_ADMIN \
             -e VERSION="10" \
-            -p 8006:8006 \
+            --net=host \
             dockurr/windows
 
-      - name: Installer Cloudflare Tunnel (cloudflared)
+      - name: Récupérer l'IP Tailscale du runner
         run: |
-          curl -L --output cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
-          chmod +x cloudflared
-          sudo mv cloudflared /usr/local/bin/
-
-      - name: Lancer le tunnel Cloudflare pour le port 8006
-        run: |
-          echo "=== URL D'ACCÈS CLOUDFLARE ==="
-          cloudflared tunnel --url http://localhost:8006 &
-          sleep 10
+          echo "=== ADRESSE IP TAILSCALE DU RUNNER ==="
+          tailscale ip -4
+          echo "Utilisez cette adresse IP suivie du port 3389 dans votre client RDP (ex: 100.x.x.x:3389)"
 
       - name: Garder la session active
         run: |
-          # Le runner reste allumé pendant 2 heures
+          # Le runner reste allumé pendant 2 heures pour vous laisser travailler
           sleep 7200
