@@ -16,11 +16,12 @@ jobs:
           sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
           ls -l /dev/kvm
 
-      - name: Lancer Windows via Docker
+      - name: Lancer Windows 10 via Docker
         run: |
           docker run -d --name windows10 \
             --device=/dev/kvm \
             --cap-add=NET_ADMIN \
+            -e VERSION="10" \
             -p 8006:8006 \
             dockurr/windows
 
