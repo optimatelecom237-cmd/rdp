@@ -26,12 +26,19 @@ jobs:
             -p 3389:3389/udp \
             dockurr/windows
 
-      - name: Patienter le démarrage complet de Windows
-        run: sleep 30
-
-      - name: Ouvrir un tunnel TCP sécurisé via Pinggy
+      - name: Installer Playit.gg
         run: |
-          echo "=== COPIEZ L'ADRESSE TCP CI-DESSOUS POUR LE RDP ==="
-          # Lance un tunnel TCP gratuit vers le port 3389
-          ssh -o StrictHostKeyChecking=no -R 0:localhost:3389 tcp@a.pinggy.io &
-          sleep 10
+          curl -SsL https://playit-cloud.github.io/ppa/key.gpg | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/playit-keyring.gpg
+          echo "deb [signed-by=/etc/apt/trusted.gpg.d/playit-keyring.gpg] https://playit-cloud.github.io/ppa/debian stable main" | sudo tee /etc/apt/sources.list.d/playit-cloud.list
+          sudo apt update && sudo apt install -y playit
+
+      - name: Lancer le tunnel Playit.gg pour le RDP (3389)
+        run: |
+          echo "=== LIEN PLAYIT.GG (Regardez les logs pour l'adresse TCP) ==="
+          playit &
+          sleep 15
+
+      - name: Garder la session active
+        run: |
+          # Le runner reste allumé pendant 2 heures
+          sleep 7200
