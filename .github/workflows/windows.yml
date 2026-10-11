@@ -26,21 +26,19 @@ jobs:
             -p 3389:3389/udp \
             dockurr/windows
 
-      - name: Installer Ngrok
+      - name: Installer Node.js et LocalTunnel
         run: |
-          curl -sSL https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -o ngrok.tgz
-          sudo tar -xzf ngrok.tgz -C /usr/local/bin
-          rm ngrok.tgz
-          ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
+          sudo apt-get update && sudo apt-get install -y nodejs npm
+          sudo npm install -g localtunnel
 
-      - name: Ouvrir le tunnel RDP via Ngrok
+      - name: Ouvrir le tunnel RDP via LocalTunnel
         run: |
-          nohup ngrok tcp 3389 --region eu &
+          nohup lt --port 3389 &
           sleep 5
-          echo "=== LIEN RDP NGROK ==="
-          curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"'
+          echo "=== LIEN RDP LOCALTUNNEL ==="
+          curl -s https://loca.lt/mytunnelpassword || true
 
       - name: Garder la session active
         run: |
-          # Le runner reste allumé pendant 2 heures pour vous laisser travailler
+          # Le runner reste allumé pendant 2 heures
           sleep 7200
