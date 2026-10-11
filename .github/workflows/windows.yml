@@ -1,39 +1,27 @@
-name: Windows Docker RDP
+name: Windows RDP Workflow
 
 on:
-  workflow_dispatch: # Permet de lancer le workflow manuellement depuis l'onglet Actions de GitHub
+  workflow_dispatch:
 
 jobs:
-  run-windows:
+  windows:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Vérifier la disponibilité de KVM (Virtualisation)
+      - name: Activer la virtualisation KVM
         run: |
-          echo "Vérification de /dev/kvm :"
-          ls -l /dev/kvm || echo "KVM non disponible directement"
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+          groups
+          ls -l /dev/kvm
 
-      - name: Lancer les services avec Docker Compose
+      - name: Lancer Windows via QEMU
         run: |
-          docker compose up -d
-
-      - name: Installer Ngrok pour exposer le RDP
-        run: |
-          curl -sLok https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | tar xz
-          sudo mv ngrok /usr/local/bin/
-          # Remplacez par votre token ngrok si vous en avez un, ou utilisez un tunnel anonyme
-          ngrok config add-authtoken ${{ secrets.NGROK_AUTHTOKEN }}
-
-      - name: Exposer le port RDP (3389) via Ngrok
-        run: |
-          nohup ngrok tcp 3389 --region eu &
-          sleep 5
-          echo "=== URL RDP Ngrok ==="
-          curl -s http://localhost:4040/api/tunnels | grep -o '"public_url":"[^"]*"'
-
-      - name: Garder le runner actif pour les tests
-        run: |
-          # Garde la machine active pendant 2 heures (maximum autorisé par job)
-          sleep 7200
+          docker run -d --name windows10 \
+            --device=/dev/kvm \
+            -p 8006:8006 \
+            -p 3389:3389/tcp \
+            dockurr/windows
+        # Note: Si vous utilisez un token d'authentification Docker Hub, vous pouvez vous connecter avant.
