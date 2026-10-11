@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   windows:
-    image: dockur/windows
+    image: qemux/windows
     container_name: windows10
     environment:
       VERSION: "10"
