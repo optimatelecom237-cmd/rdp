@@ -1,4 +1,4 @@
-name: Windows 7 RDP via Tailscale
+name: Windows 10 RDP via Tailscale
 
 on:
   workflow_dispatch:
@@ -22,17 +22,17 @@ jobs:
           authkey: ${{ secrets.TS_AUTHKEY }}
           args: --accept-routes
 
-      - name: Lancer Windows 7 via Docker
+      - name: Lancer Windows 10 via Docker
         run: |
-          docker run -d --name windows7 \
+          docker run -d --name windows10 \
             --device=/dev/kvm \
             --cap-add=NET_ADMIN \
-            -e VERSION="7" \
+            -e VERSION="10" \
             -p 3389:3389/tcp \
             -p 3389:3389/udp \
             dockurr/windows
 
-      - name: Vérifier l'état du conteneur Windows 7
+      - name: Vérifier l'état du conteneur Windows 10
         run: docker ps -a
 
       - name: Récupérer l'IP Tailscale du runner
