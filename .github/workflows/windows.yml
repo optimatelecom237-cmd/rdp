@@ -32,6 +32,9 @@ jobs:
             -p 3389:3389/udp \
             dockurr/windows
 
+      - name: Vérifier l'état du conteneur Windows 7
+       run: docker ps -a
+    
       - name: Récupérer l'IP Tailscale du runner
         run: |
           echo "=== ADRESSE IP TAILSCALE DU RUNNER ==="
